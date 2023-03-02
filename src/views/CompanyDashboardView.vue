@@ -1,58 +1,44 @@
 <script setup>
-import { computed, ref, onMounted } from "vue";
-import { useMainStore } from "@/stores/main";
-import {
-  mdiAccountMultiple,
-  mdiCartOutline,
-  mdiChartTimelineVariant,
-  mdiMonitorCellphone,
-  mdiReload,
-  mdiGithub,
-  mdiChartPie,
-  mdiInformationOutline
-} from "@mdi/js";
-import * as chartConfig from "@/components/Charts/chart.config.js";
-import LineChart from "@/components/Charts/LineChart.vue";
+import { ref, onMounted } from "vue";
 import SectionMain from "@/components/SectionMain.vue";
-import CardBoxWidget from "@/components/CardBoxWidget.vue";
-import CardBox from "@/components/CardBox.vue";
-import TableSampleClients from "@/components/TableSampleClients.vue";
-import NotificationBar from "@/components/NotificationBar.vue";
-import BaseButton from "@/components/BaseButton.vue";
-import CardBoxTransaction from "@/components/CardBoxTransaction.vue";
-import CardBoxClient from "@/components/CardBoxClient.vue";
-import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import LayoutCompany from "@/layouts/LayoutCompany.vue";
-import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
-import SectionBannerStarOnGitHub from "@/components/SectionBannerStarOnGitHub.vue";
-import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
-import companyBanner from "@/assets/company2_banner.png";
-import companyLogo from "@/assets/company_logo.jpeg";
-import BaseIcon from "@/components/BaseIcon.vue";
+import Cookies from "js-cookie";
+import CardBoxCompanyVue from "../components/CardBoxCompany.vue";
+import { companyService } from "@/_services";
+import _ from "lodash";
 
+// let user = JSON.parse(Cookies.get("user"));
+
+let company = ref();
+const imagedefault = () => {};
+onMounted(() => {
+  companyService
+    .getCompany()
+    .then(
+      (res) => (
+        (company.value = res.data),
+        (company.value.logo = _.isNil(company.value.logo)
+          ? (company.value.logo = {
+              image:
+                "https://thumbs.dreamstime.com/b/blank-purple-violet-paper-texture-background-art-design-ba-blank-purple-violet-paper-texture-background-art-design-117683675.jpg",
+            })
+          : company.value.logo),
+        (company.value.banner = _.isNil(company.value.banner)
+          ? (company.value.banner = {
+              image: "https://i.ytimg.com/vi/mEfcJF34Vmo/maxresdefault.jpg",
+            })
+          : company.value.banner),
+        console.log("company-->", company)
+      )
+    )
+    .catch((err) => console.log("probleme-->", err));
+});
 </script>
 
 <template>
   <LayoutCompany>
     <SectionMain>
-      <CardBox class="h-screen">
-        <img class="w-full mb-32" :src="companyBanner" />
-        <div class="absolute flex items-center" style="top: 400px">
-          <img class="w-64 border-8 border-white drop-shadow-md mr-4" :src="companyLogo" />
-          <div class="flex flex-col self-end">
-            <div class="uppercase font-bold text-3xl">Pôle Emploi</div>
-            <div>Établissement public à caractère administratif Français de recherche d'emploi</div>
-          </div>
-        </div>
-        <div class="w-full flex flex-col items-center">
-          <div class="flex items-center text-lg w-full"><BaseIcon :path="mdiInformationOutline" size="25" class="mr-2" />Informations</div>
-          <ul class="list-disc list-outside w-11/12">
-            <li>Secteur: Recherche d'emploi</li>
-            <li>Date de création: 1990</li>
-          </ul>
-        </div>
-      </CardBox>
-      
+      <CardBoxCompanyVue :item="company" v-if="company" />
     </SectionMain>
   </LayoutCompany>
 </template>

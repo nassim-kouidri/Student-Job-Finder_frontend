@@ -31,12 +31,6 @@ const menuClick = (event, item) => {
   emit("menu-click", event, item);
 };
 
-const router = useRouter();
-
-const logout = () => {
-  router.push("/");
-}
-
 const asideLgCloseClick = (event) => {
   emit("aside-lg-close-click", event);
 };
@@ -45,11 +39,11 @@ const asideLgCloseClick = (event) => {
 <template>
   <aside
     id="aside"
-    class="lg:py-2 lg:pl-2 w-60 fixed flex z-40 top-0 h-screen transition-position overflow-hidden"
+    class="w-64 fixed flex z-40 top-0 h-screen bg-green transition-position overflow-hidden"
   >
     <div
       :class="styleStore.asideStyle"
-      class="lg:rounded-2xl flex-1 flex flex-col overflow-hidden dark:bg-slate-900"
+      class="rounded h-screen flex-1 flex flex-col overflow-hidden dark:bg-slate-900"
     >
       <div
         :class="styleStore.asideBrandStyle"
@@ -79,8 +73,8 @@ const asideLgCloseClick = (event) => {
         <AsideMenuList :menu="menu" @menu-click="menuClick" />
       </div>
 
-      <ul>
-        <AsideMenuItem :item="logoutItem" @click="logout" />
+      <ul class="">
+        <AsideMenuItem :item="logoutItem" @menu-click="menuClick" isLogout="true" />
       </ul>
     </div>
   </aside>

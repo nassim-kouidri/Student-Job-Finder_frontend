@@ -40,6 +40,16 @@ const props = defineProps({
     type: [String, Number, Boolean, Array, Object],
     default: "",
   },
+  maxLength: Number,
+  minLength: Number,
+  min: {
+    type: Number,
+    default: 0,
+  },
+  max: {
+    type: Number,
+    default: 999999,
+  },
   required: Boolean,
   borderless: Boolean,
   transparent: Boolean,
@@ -57,18 +67,25 @@ const computedValue = computed({
 });
 
 const inputElClass = computed(() => {
-  const base = [
-    "px-3 py-2 max-w-full focus:ring focus:outline-none border-gray-700 rounded w-full",
+  let base = [
+    "px-3 py-2 max-w-full border-gray-700 rounded w-full focus:outline-none focus:border-purple-500 focus:ring-purple-600",
     "dark:placeholder-gray-400",
     computedType.value === "textarea" ? "h-24" : "h-12",
     props.borderless ? "border-0" : "border",
     props.transparent ? "bg-transparent" : "bg-white dark:bg-slate-800",
   ];
-
+  if (props.disabled) {
+    base = [
+      "px-3 py-2 max-w-full border-slate-400 rounded w-full text-slate-400",
+      "dark:placeholder-gray-400",
+      computedType.value === "textarea" ? "h-24" : "h-12",
+      props.borderless ? "border-0" : "border",
+      props.transparent ? "bg-transparent" : "bg-white dark:bg-slate-800",
+    ];
+  }
   if (props.icon) {
     base.push("pl-10");
   }
-
   return base;
 });
 
@@ -134,7 +151,7 @@ if (props.ctrlKFocus) {
       <option
         v-for="option in options"
         :key="option.id ?? option"
-        :value="option"
+        :value="option.value ?? option"
       >
         {{ option.label ?? option }}
       </option>
@@ -143,9 +160,14 @@ if (props.ctrlKFocus) {
       v-else-if="computedType === 'textarea'"
       :id="id"
       v-model="computedValue"
+      :maxlength="maxLength"
+      :minlength="minLength"
       :class="inputElClass"
+      class="h-48"
       :name="name"
       :placeholder="placeholder"
+      rows="4"
+      cols="25"
       :required="required"
     />
     <input
@@ -159,6 +181,10 @@ if (props.ctrlKFocus) {
       :required="required"
       :placeholder="placeholder"
       :type="computedType"
+      :maxlength="maxLength"
+      :minlength="minLength"
+      :min="min"
+      :max="max"
       :class="inputElClass"
       :disabled="disabled"
     />

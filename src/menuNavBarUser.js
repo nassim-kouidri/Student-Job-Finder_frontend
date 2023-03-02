@@ -1,9 +1,10 @@
 import {
   mdiAccount,
   mdiLogout,
+  mdiTextBoxCheck,
+  mdiBookmark,
+  mdiEmail,
 } from "@mdi/js";
-
-
 
 export default [
   {
@@ -11,8 +12,23 @@ export default [
     menu: [
       {
         icon: mdiAccount,
-        label: "Profil",
-        to: "/profile",
+        label: "Mon profil",
+        to: "/student",
+      },
+      {
+        icon: mdiTextBoxCheck,
+        label: "Mes candidatures",
+        to: "/student/admissions",
+      },
+      {
+        icon: mdiBookmark,
+        label: "Mes offres",
+        to: "/student/favoffers",
+      },
+      {
+        icon: mdiEmail,
+        label: "Messagerie",
+        to: "/student/chat",
       },
       {
         isDivider: true,

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { useMainStore } from "@/stores/main.js";
 import { mdiAccount, mdiAsterisk, mdiCalendarRange, mdiPhone } from "@mdi/js";
 import SectionFullScreen from "@/components/SectionFullScreen.vue";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
@@ -19,6 +20,7 @@ const router = useRouter();
 let student_values = JSON.parse(Cookies.get("account_cookies"));
 
 const form = reactive({
+  role: "student",
   fname: "",
   name: "",
   birthDay: null,
@@ -31,19 +33,24 @@ const account = reactive({
   email: student_values.email,
   password: student_values.password,
 });
+
+const isLoading = ref(false);
 const submit = () => {
+  isLoading.value = true;
   accountService
     .registerStudent(form)
     .then((res) => {
-      accountService
-        .login(account)
-        .then((res) => {
-          accountService.saveToken("token", res.data.token, 800000);
-          router.push("/");
-        })
-        .catch((err) => console.log(err));
+      isLoading.value = false;
+      router.push("/register/verify-step");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      isLoading.value = false;
+      console.log(err);
+    });
+};
+
+const revenir = () => {
+  router.push("/register/student-step-1");
 };
 </script>
 
@@ -51,53 +58,55 @@ const submit = () => {
   <LayoutAuthenticated>
     <SectionFullScreen v-slot="{ cardClass }" bg="gray">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        ----------{{ form.birthDay }}
         <div class="flex justify-center">
           <div class="flex flex-col justify-between w-10/12">
-            <CardBoxComponentTitle title="Étape 2"></CardBoxComponentTitle>
-            <FormField label="Prénom">
+            <CardBoxComponentTitle title="Étape 2" underlined centered>
+            </CardBoxComponentTitle>
+            <FormField label="Prénom" required>
               <FormControl
                 type="text"
                 :icon="mdiAccount"
                 name="fname"
                 v-model="form.fname"
+                required
               />
             </FormField>
-            <FormField label="Nom">
+            <FormField label="Nom" required>
               <FormControl
                 type="text"
                 :icon="mdiAccount"
                 name="name"
                 v-model="form.name"
+                required
               />
             </FormField>
-            <FormField label="Date de naissance">
+            <FormField label="Date de naissance" required>
               <FormControl
                 type="date"
                 :icon="mdiCalendarRange"
                 name="birthDay"
                 v-model="form.birthDay"
+                required
               />
             </FormField>
-            <FormField label="Numéro de téléphone">
+            <FormField label="Numéro de téléphone" required>
               <FormControl
                 type="number"
                 :icon="mdiPhone"
                 name="num_tel"
                 v-model="form.phoneNumber"
+                required
               />
             </FormField>
+            <BaseButton type="submit" color="info" label="Enregistrer" />
+            <BaseDivider />
             <BaseButton
-              type="submit"
-              color="info"
-              label="Enregistrer"
-              :disabled="form.fname == ''"
+              v-on:click="revenir"
+              color="infligthDarko"
+              label="Revenir"
+              :disabled="isLoading"
+              :isLoading="isLoading"
             />
-            <RouterLink to="/student-step-1"
-              ><div class="mt-4 underline text-center">
-                étape précédente
-              </div></RouterLink
-            >
           </div>
         </div>
       </CardBox>

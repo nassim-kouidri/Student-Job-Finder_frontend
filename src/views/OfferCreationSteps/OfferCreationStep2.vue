@@ -15,17 +15,21 @@ import SectionTitle from "@/components/SectionTitle.vue";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 import NotificationBarInCard from "@/components/NotificationBarInCard.vue";
+import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import Cookies from "js-cookie";
+import ProgressBar from "../../components/ProgressBar.vue";
 import LayoutCompany from "../../layouts/LayoutCompany.vue";
 
 let offerCreation_values = JSON.parse(Cookies.get("offerCreation_cookies"));
 
 const router = useRouter();
 
+console.log("offerici--->" + offerCreation_values);
+
 const form = reactive({
   context: "",
   mission: "",
-  requiredProfil: "",
+  searchedProfile: "",
 });
 
 const submit = () => {
@@ -38,45 +42,58 @@ const submit = () => {
       remoteWork: offerCreation_values.remoteWork,
       nbrPlaces: offerCreation_values.nbrPlaces,
       salary: offerCreation_values.salary,
-      address: offerCreation_values.address,
-      city: offerCreation_values.city,
-      zipCode: offerCreation_values.zipCode,
+      level: offerCreation_values.level,
+      address: {
+        city: offerCreation_values.address.city,
+        zipcode: offerCreation_values.address.zipcode,
+      },
       startDate: offerCreation_values.startDate,
       endDate: offerCreation_values.endDate,
       context: form.context,
       mission: form.mission,
-      requiredProfil: form.requiredProfil,
+      searchedProfile: form.searchedProfile,
     })
   );
-  router.push("/OfferCreationStep3");
+  router.push("/company/offer-step-3");
 };
 const revenir = () => {
-  router.push("/OfferCreationStep1");
+  router.push("/company/offer-step-1");
 };
 </script>
 
 <template>
   <LayoutCompany>
     <SectionMain>
-      <SectionTitleLineWithButton
-        :icon="mdiBallotOutline"
-        title="Création offre 2"
-        main
-      >
-      </SectionTitleLineWithButton>
-
       <CardBox is-form @submit.prevent="submit">
-        <p>-------{{ offerCreation_values.title }}</p>
-        <FormField label="Contexte de l'offre" help=" Max 255 characters">
-          <FormControl type="textarea" v-model="form.context" />
-        </FormField>
-        <FormField label="La mission" help=" Max 255 characters">
-          <FormControl type="textarea" v-model="form.mission" />
-        </FormField>
-        <FormField label="Profil recherché" help=" Max 255 characters">
-          <FormControl type="textarea" v-model="form.requiredProfil" />
+        <CardBoxComponentTitle
+          title="Création d'une offre - Étape 2"
+          centered
+        />
+        <ProgressBar :stepOne="true" :stepTwo="true" :step-three="false" />
+
+        <FormField label="Contexte de l'offre" help=" Max 1200 characters">
+          <FormControl
+            type="textarea"
+            v-model="form.context"
+            maxLength="1200"
+          />
         </FormField>
 
+        <FormField label="La mission" help=" Max 1200 characters">
+          <FormControl
+            type="textarea"
+            v-model="form.mission"
+            maxLength="1200"
+          />
+        </FormField>
+        <BaseDivider />
+        <FormField label="Profil recherché" help=" Max 1200 characters">
+          <FormControl
+            type="textarea"
+            v-model="form.searchedProfile"
+            maxLength="1200"
+          />
+        </FormField>
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="info" label="Continuer" />

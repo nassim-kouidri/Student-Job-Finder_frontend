@@ -1,34 +1,29 @@
 import {
-  mdiAccountCircle,
-  mdiMonitor,
-  mdiGithub,
-  mdiLock,
-  mdiAlertCircle,
-  mdiSquareEditOutline,
-  mdiTable,
-  mdiBriefcase,
-  mdiFolderPlusOutline,
-  mdiViewList,
-  mdiTelevisionGuide,
-  mdiResponsive,
-  mdiPalette,
-  mdiReact,
+  mdiMonitorDashboard,
+  mdiPlus,
+  mdiFormatListBulleted,
+  mdiEmail,
 } from "@mdi/js";
 
 export default [
   {
-    to: "/company_dashboard",
-    icon: mdiMonitor,
+    to: "/company",
+    icon: mdiMonitorDashboard,
     label: "Dashboard",
   },
   {
-    to: "/OfferCreationStep1",
-    icon: mdiFolderPlusOutline,
+    to: "/company/offer-step-1",
+    icon: mdiPlus,
     label: "Créer une offre",
   },
   {
-    to: "/company_dashboard",
-    icon: mdiBriefcase,
+    to: "/company/offer",
+    icon: mdiFormatListBulleted,
     label: "Vos offres",
+  },
+  {
+    to: "/company/chatcompany",
+    icon: mdiEmail,
+    label: "Messagerie",
   },
 ];

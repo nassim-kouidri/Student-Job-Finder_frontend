@@ -5,15 +5,15 @@ import { darkModeKey, styleKey } from "@/config";
 export const useStyleStore = defineStore("style", {
   state: () => ({
     /* Styles */
-    asideStyle: "",
+    asideStyle: "bg-white",
     asideScrollbarsStyle: "",
     asideBrandStyle: "",
-    asideMenuItemStyle: "",
-    asideMenuItemActiveStyle: "",
+    asideMenuItemStyle: "flex hover:cursor-pointer",
+    asideMenuItemActiveStyle: "font-semibold text-purple-500",
     asideMenuDropdownStyle: "",
     navBarItemLabelStyle: "",
     navBarItemLabelHoverStyle: "",
-    navBarItemLabelActiveColorStyle: "",
+    navBarItemLabelActiveColorStyle: "font-semibold text-purple-500",
     overlayStyle: "",
 
     /* Dark mode */

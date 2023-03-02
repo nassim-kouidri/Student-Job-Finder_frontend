@@ -11,6 +11,7 @@ const props = defineProps({
   title: {
     type: String,
     required: true,
+    default: "",
   },
   button: {
     type: String,
@@ -20,10 +21,17 @@ const props = defineProps({
     type: String,
     default: "Done",
   },
+  hasDone: Boolean,
   hasCancel: Boolean,
+  hasClose: Boolean,
+  small: Boolean,
   modelValue: {
     type: [String, Number, Boolean],
     default: null,
+  },
+  withAction: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -48,37 +56,41 @@ window.addEventListener("keydown", (e) => {
     cancel();
   }
 });
+
+const componentClass = computed(() => {
+  const base = [
+    props.small ? "w-[30rem] h-50" : "w-8/12 max-h-5/6 h-auto overflow-auto",
+  ];
+  return base;
+});
 </script>
 
 <template>
   <OverlayLayer v-show="value" @overlay-click="cancel">
     <CardBox
       v-show="value"
-      class="shadow-lg max-h-modal w-11/12 md:w-3/5 lg:w-2/5 xl:w-4/12 z-50"
+      class="shadow-lg z-50 border-0"
       is-modal
+      :class="componentClass"
     >
-      <CardBoxComponentTitle :title="title">
-        <BaseButton
-          v-if="hasCancel"
-          :icon="mdiClose"
-          color="whiteDark"
-          small
-          rounded-full
-          @click.prevent="cancel"
-        />
-      </CardBoxComponentTitle>
-
-      <div class="space-y-3">
-        <slot />
+      <div class="flex items-center">
+        <CardBoxComponentTitle :title="title" />
+        <BaseButton v-if="hasClose" :icon="mdiClose" @click="cancel" />
       </div>
-
+      <slot />
       <template #footer>
         <BaseButtons>
-          <BaseButton :label="buttonLabel" :color="button" @click="confirm" />
           <BaseButton
+            v-if="hasDone"
+            :label="buttonLabel"
+            color="info"
+            @click="confirm"
+          />
+          <BaseButton
+            class="relative top-0 left-0"
             v-if="hasCancel"
-            label="Cancel"
-            :color="button"
+            label="Annuler"
+            color="danger"
             outline
             @click="cancel"
           />

@@ -21,9 +21,10 @@ const selectOptions = [
   { id: 3, label: "Sales" },
 ];
 const user = ref({
-  email: "ppp",
+  email: "",
   password: "",
 });
+
 console.log("===>", user.value.email);
 const form = reactive({
   name: "John Doe",

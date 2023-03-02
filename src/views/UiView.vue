@@ -79,7 +79,7 @@ const styleStore = useStyleStore();
   <LayoutAuthenticated>
     <CardBoxModal
       v-model="modalOneActive"
-      title="Please confirm action"
+      title="Pleasez confirm action"
       button-label="Confirm"
       has-cancel
     >
@@ -126,16 +126,16 @@ const styleStore = useStyleStore();
           is-hoverable
           @click="modalOneActive = true"
         >
-          <CardBoxComponentTitle title="Please confirm action">
+          <CardBoxComponentTitle title="Pleases ccconfirm action">
             <BaseButton :icon="mdiClose" color="whiteDark" small rounded-full />
           </CardBoxComponentTitle>
           <div class="space-y-3">
-            <p>Click to see in action</p>
+            <p>Click to see innn action</p>
           </div>
 
           <template #footer>
             <BaseButtons>
-              <BaseButton label="Confirm" color="info" />
+              <BaseButton label="Confirmmm" color="info" />
               <BaseButton label="Cancel" color="info" outline />
             </BaseButtons>
           </template>

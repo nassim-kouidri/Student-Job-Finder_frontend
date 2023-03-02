@@ -18,7 +18,7 @@ const router = useRouter();
 
 const submit = () => {
   var fifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 1000);
-  Cookies.set("account_cookies", role.value, { expires: fifteenMinutes });
+  Cookies.set("account_cookies", role.value);
   if (role.value == "student") {
     router.push("/register/student-step-1");
   } else {
@@ -40,11 +40,14 @@ if (cookies != null) {
 <template>
   <LayoutAuthenticated>
     <SectionFullScreen v-slot="{ cardClass }" bg="gray">
-      <!--<img :src="logo" class="w-40 mb-12"/>-->
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
         <div class="flex justify-center">
           <div class="flex flex-col w-10/12">
-            <CardBoxComponentTitle title="Inscription"></CardBoxComponentTitle>
+            <CardBoxComponentTitle
+              title="Inscription"
+              underlined
+              centered
+            ></CardBoxComponentTitle>
             <FormField label="Je suis:">
               <FormCheckRadioGroup
                 type="radio"

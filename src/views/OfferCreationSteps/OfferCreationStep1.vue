@@ -5,12 +5,21 @@ import {
   mdiAccount,
   mdiMail,
   mdiGithub,
+  mdiFileDocumentEditOutline,
   mdiMapMarkerRadius,
   mdiCalendarRange,
+  mdiRayStartVertexEnd,
+  mdiDomain,
+  mdiSchool,
+  mdiWallet,
+  mdiCurrencyEur,
+  mdiAccountGroup,
+  mdiWebcam,
 } from "@mdi/js";
 import { useRouter } from "vue-router";
 import SectionMain from "@/components/SectionMain.vue";
 import CardBox from "@/components/CardBox.vue";
+import ProgressBar from "../../components/ProgressBar.vue";
 import FormCheckRadioGroup from "@/components/FormCheckRadioGroup.vue";
 import FormFilePicker from "@/components/FormFilePicker.vue";
 import FormField from "@/components/FormField.vue";
@@ -21,6 +30,8 @@ import BaseButtons from "@/components/BaseButtons.vue";
 import SectionTitle from "@/components/SectionTitle.vue";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
+import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
+
 import EntrepriseStep1 from "../Register/Company/EntrepriseStep1.vue";
 import EntrepriseStep3 from "../Register/Company/EntrepriseStep3.vue";
 import Cookies from "js-cookie";
@@ -28,20 +39,87 @@ import LayoutCompany from "../../layouts/LayoutCompany.vue";
 
 const router = useRouter();
 
-const selectOptionsSector = ["Marketing", "Business development", "Sales"];
-const selectOptionsContrat = ["CDI", "CDD", "Stage", "Alternance", "Freelance"];
-const selectOptionsRemoteWork = ["Oui", "Non"];
+const selectOptionsSector = [
+  "Administratif",
+  "Aéronautique et Transport aérien",
+  "Agriculture",
+  "Agroalimentaire",
+  "Architecte - BTP - Urbanisme",
+  "Armée - Sécurité",
+  "Hardware, software",
+  "Art - Culture",
+  "Assurance",
+  "Audiovisuel - Cinéma",
+  "Automobile",
+  "Banque - Finance",
+  "Chimie - Biologie",
+  "Commerce - Vente - Distribution",
+  "Marketing - Communication",
+  "Comptabilité - Economie - Gestion",
+  "Droit - Justice",
+  "Hôtellerie - Restauration - Tourisme",
+  "Energie",
+  "Evenemmentiel",
+  "Immobilier",
+  "Journalisme",
+  "Industriel",
+  "Informatique - Electronique - Numérique",
+  "Ressourses Humaines",
+  "Sport",
+  "Santé - Paramédical",
+  "Transport  Logistique",
+  "Enseignement - Formation",
+];
+const selectOptionsContrat = ["CDI", "CDD", "STAGE", "ALTERNANCE"];
+const selectOptionsRemoteWork = [
+  {
+    label: "Oui",
+    value: true,
+  },
+  {
+    label: "Non",
+    value: false,
+  },
+];
+const selectOptionsLevel = [
+  {
+    label: "BAC",
+    value: "BAC",
+  },
+  {
+    label: "BAC + 1",
+    value: "BAC+1",
+  },
+  {
+    label: "BAC + 2",
+    value: "BAC+2",
+  },
+  {
+    label: "BAC + 3",
+    value: "BAC+3",
+  },
+  {
+    label: "BAC + 4",
+    value: "BAC+4",
+  },
+  {
+    label: "BAC + 5",
+    value: "BAC+5",
+  },
+];
 
 const form = reactive({
   title: "",
-  sector: selectOptionsSector[0],
+  sector: selectOptionsSector[14],
   contract: selectOptionsContrat[0],
-  remoteWork: selectOptionsRemoteWork[0],
+  remoteWork: "",
   nbrPlaces: null,
   salary: null,
-  address: "",
-  city: "",
-  zipCode: "",
+  address: {
+    city: "",
+    zipcode: "",
+  },
+  level: "",
   startDate: "",
   endDate: "",
 });
@@ -56,46 +134,46 @@ const submit = () => {
       remoteWork: form.remoteWork,
       nbrPlaces: form.nbrPlaces,
       salary: form.salary,
-      address: form.address,
-      city: form.city,
-      zipCode: form.zipCode,
+      address: {
+        city: form.address.city,
+        zipcode: form.address.zipcode,
+      },
+      level: form.level,
       startDate: form.startDate,
       endDate: form.endDate,
     })
   );
-  router.push("/OfferCreationStep2");
+  router.push("/company/offer-step-2");
 };
 </script>
 
 <template>
   <LayoutCompany>
     <SectionMain>
-      <SectionTitleLineWithButton title="Création offre 1" main>
-      </SectionTitleLineWithButton>
-
       <CardBox is-form @submit.prevent="submit">
-        -----{{ form.title }}
-
+        <CardBoxComponentTitle title="Création d'une offre " centered />
+        <ProgressBar :stepOne="true" :stepTwo="false" :step-three="false" />
         <FormField label="Titre de l'offre">
           <FormControl
-            placeholder="Dévelopeur web fullstack"
-            on="mdiAccount"
+            type="text"
             v-model="form.title"
+            :maxLength="100"
             required
+            underlined
           />
         </FormField>
-
         <div class="flex justify-between">
-          <FormField label="Secteur de travail" class="w-5/12">
+          <FormField label="Secteur d'activité" class="w-5/12">
             <FormControl
+              :icon="mdiDomain"
               v-model="form.sector"
               :options="selectOptionsSector"
               required
             />
           </FormField>
-
           <FormField label="Type de contrat" class="w-5/12">
             <FormControl
+              :icon="mdiFileDocumentEditOutline"
               v-model="form.contract"
               :options="selectOptionsContrat"
               required
@@ -104,51 +182,67 @@ const submit = () => {
         </div>
 
         <div class="flex justify-between">
-          <FormField label="Teletravail" class="w-5/12">
+          <FormField label="Télétravail" class="w-5/12">
             <FormControl
+              :icon="mdiWebcam"
               v-model="form.remoteWork"
               :options="selectOptionsRemoteWork"
               required
             />
           </FormField>
 
-          <FormField label="Nombre de candidat souhaité" class="w-5/12">
-            <FormControl :icon="mdiAccount" v-model="form.nbrPlaces" required />
+          <FormField label="Nombre de poste disponible" class="w-5/12">
+            <FormControl
+              :icon="mdiAccountGroup"
+              v-model="form.nbrPlaces"
+              type="number"
+              :min="1"
+              required
+            />
           </FormField>
         </div>
-
-        <FormField label="Salaire approximatif">
-          <FormControl
-            placeholder="€€"
-            :icon="mdiAccount"
-            v-model="form.salary"
-            required
-          />
-        </FormField>
+        <div class="flex justify-between">
+          <FormField label="Salaire approximatif" class="w-5/12">
+            <FormControl
+              placeholder=""
+              type="number"
+              :icon="mdiWallet"
+              v-model="form.salary"
+              :min="0"
+              required
+            />
+          </FormField>
+          <FormField label="Niveau recherché" class="w-5/12">
+            <FormControl
+              :icon="mdiSchool"
+              :options="selectOptionsLevel"
+              v-model="form.level"
+              required
+            />
+          </FormField>
+        </div>
         <BaseDivider />
-
-        <FormField label="Lieu de travail">
-          <div class="flex justify-between">
+        <div class="flex justify-between">
+          <FormField label="Ville" class="w-5/12">
             <FormControl
-              placeholder="adresse"
               :icon="mdiMapMarkerRadius"
-              v-model="form.address"
+              v-model="form.address.city"
+              type="text"
+              :maxLength="50"
               required
             />
+          </FormField>
+          <FormField label="Code postale" class="w-5/12">
             <FormControl
-              placeholder="ville"
               :icon="mdiMapMarkerRadius"
-              v-model="form.city"
+              v-model="form.address.zipcode"
+              type="number"
+              :min="1000"
+              :max="99000"
               required
             />
-            <FormControl
-              placeholder="code postal"
-              :icon="mdiMapMarkerRadius"
-              v-model="form.zipCode"
-              required
-            />
-          </div>
-        </FormField>
+          </FormField>
+        </div>
         <div class="flex justify-between">
           <FormField label="Date de début" class="w-5/12">
             <FormControl
@@ -174,12 +268,6 @@ const submit = () => {
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="info" label="Continuer" />
-            <!-- <BaseButton
-              type="reset"
-              color="info"
-              outline
-              label="Revenir en arrière"
-            /> -->
           </BaseButtons>
         </template>
       </CardBox>

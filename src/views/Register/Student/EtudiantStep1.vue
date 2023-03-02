@@ -5,11 +5,14 @@ import {
   mdiAccount,
   mdiAsterisk,
   mdiCalendarRange,
+  mdiAlertCircle,
   mdiPhone,
   mdiEmail,
   mdiLock,
 } from "@mdi/js";
 import SectionFullScreen from "@/components/SectionFullScreen.vue";
+import NotificationBarInCard from "@/components/NotificationBarInCard.vue";
+
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import CardBox from "@/components/CardBox.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
@@ -23,27 +26,60 @@ import Cookies from "js-cookie";
 
 const router = useRouter();
 
-const submit = () => {
-  var fifteenMinutes = new Date(new Date().getTime() + 10 * 1000);
-  if (account.password === account.passwordverif) {
-    Cookies.set(
-      "account_cookies",
-      JSON.stringify({
-        role: Cookies.get("account_cookies"),
-        email: account.email,
-        password: account.password,
-      }),
-      { expires: fifteenMinutes }
-    );
-    router.push("/register/student-step-2");
-  }
-};
+function validateEmail(email) {
+  const re =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+function validatePassword(password) {
+  const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{7,}$/;
+  return re.test(password);
+}
 
 const account = reactive({
   email: "",
   password: "",
   passwordverif: "",
 });
+
+const revenir = () => {
+  router.push("/register");
+};
+
+const invalidPassword = ref(false);
+const invalidPasswordRegex = ref(false);
+const invalidEmail = ref(false);
+const isLoading = ref(false);
+
+const submit = () => {
+  isLoading.value = true;
+  if (account.password === account.passwordverif) {
+    if (validateEmail(account.email)) {
+      if (validatePassword(account.password)) {
+        Cookies.set(
+          "account_cookies",
+          JSON.stringify({
+            role: "student",
+            email: account.email,
+            password: account.password,
+          })
+        );
+        isLoading.value = false;
+        router.push("/register/student-step-2");
+      } else {
+        isLoading.value = false;
+        invalidPasswordRegex.value = true;
+      }
+    } else {
+      isLoading.value = false;
+      invalidEmail.value = true;
+    }
+  } else {
+    invalidPassword.value = true;
+    isLoading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -52,45 +88,75 @@ const account = reactive({
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
         <div class="flex justify-center">
           <div class="flex flex-col justify-between w-10/12">
-            <CardBoxComponentTitle title="Étape 1"></CardBoxComponentTitle>
-            <FormField label="Email">
+            <CardBoxComponentTitle
+              title="Étape 1"
+              underlined
+              centered
+            ></CardBoxComponentTitle>
+            <NotificationBarInCard
+              v-show="invalidPassword"
+              color="danger"
+              :icon="mdiAlertCircle"
+              >Les mots de passe ne concordent pas
+            </NotificationBarInCard>
+            <NotificationBarInCard
+              v-show="invalidEmail"
+              color="danger"
+              :icon="mdiAlertCircle"
+              >L'email saisi est invalide, veuillez corriger
+            </NotificationBarInCard>
+            <NotificationBarInCard
+              v-show="invalidPasswordRegex"
+              color="danger"
+              :icon="mdiAlertCircle"
+              >Le mot de passe doit contenir au minimum 8 caractères
+            </NotificationBarInCard>
+            <FormField label="Email" required>
               <FormControl
-                type="text"
+                type="email"
                 :icon="mdiEmail"
                 name="email"
                 v-model="account.email"
-                required="true"
+                required
               />
             </FormField>
-            <FormField label="Mot de passe">
+            <FormField
+              label="Mot de passe"
+              help="Nécessite 8 caractères minimum"
+              required
+            >
               <FormControl
                 name="password"
                 type="password"
                 :icon="mdiLock"
                 v-model="account.password"
-                required="true"
+                minlength="8"
+                required
               />
             </FormField>
-            <FormField label="Confirmation du mot de passe">
+            <FormField label="Confirmation du mot de passe" required>
               <FormControl
                 name="passwordverif"
                 type="password"
                 :icon="mdiLock"
                 v-model="account.passwordverif"
-                required="true"
+                minLength="8"
+                required
               />
             </FormField>
             <BaseButton
               type="submit"
               color="info"
               label="Suivant"
-              :disabled="account.email == ''"
+              :disabled="isloading"
+              :isLoading="isLoading"
             />
-            <RouterLink to="/register"
-              ><div class="mt-4 underline text-center">
-                étape précédente
-              </div></RouterLink
-            >
+            <BaseDivider />
+            <BaseButton
+              v-on:click="revenir"
+              color="infligthDarko"
+              label="Revenir"
+            />
           </div>
         </div>
       </CardBox>

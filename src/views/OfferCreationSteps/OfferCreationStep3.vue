@@ -1,22 +1,20 @@
 <script setup>
 import { reactive, ref } from "vue";
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from "@mdi/js";
 import { useRouter } from "vue-router";
+import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import SectionMain from "@/components/SectionMain.vue";
 import CardBox from "@/components/CardBox.vue";
 import FormCheckRadioGroup from "@/components/FormCheckRadioGroup.vue";
 import FormFilePicker from "@/components/FormFilePicker.vue";
 import FormField from "@/components/FormField.vue";
 import FormControl from "@/components/FormControl.vue";
-import BaseDivider from "@/components/BaseDivider.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import SectionTitle from "@/components/SectionTitle.vue";
-import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
-import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 import NotificationBarInCard from "@/components/NotificationBarInCard.vue";
 import { companyService } from "@/_services";
 import Cookies from "js-cookie";
+import ProgressBar from "../../components/ProgressBar.vue";
 import LayoutCompany from "../../layouts/LayoutCompany.vue";
 
 const router = useRouter();
@@ -29,60 +27,108 @@ const form = reactive({
   remoteWork: offerCreation_values.remoteWork,
   nbrPlaces: offerCreation_values.nbrPlaces,
   salary: offerCreation_values.salary,
-  address: offerCreation_values.address,
-  city: offerCreation_values.city,
-  zipCode: offerCreation_values.zipCode,
+  address: {
+    city: offerCreation_values.address.city,
+    zipcode: offerCreation_values.address.zipcode,
+  },
+  level: offerCreation_values.level,
+
   startDate: offerCreation_values.startDate,
   endDate: offerCreation_values.endDate,
   context: offerCreation_values.context,
   mission: offerCreation_values.mission,
-  requiredProfil: offerCreation_values.requiredProfil,
-  question: "",
-  answer: "",
+  searchedProfile: offerCreation_values.searchedProfile,
+  questions: [""],
+  // answer: "",
 });
+const counter = ref(1);
 
-var counter = 0;
+const addQuestion = () => {
+  form.questions.push("");
+  counter.value++;
+};
+
+const removeQuestion = () => {
+  form.questions.pop();
+  counter.value--;
+};
+
+const isLoading = ref(false);
+const invalidUpdate = ref(false);
+const validUpdate = ref(false);
 
 const submit = () => {
+  isLoading.value = true;
   companyService
     .offerCreation(form)
     .then((res) => {
-      router.push("/");
+      (isLoading.value = false), (validUpdate.value = true);
+      // router.push("/company");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err), (invalidUpdate.value = true), (isLoading.value = false);
+    });
 };
 const revenir = () => {
-  router.push("/OfferCreationStep2");
+  router.push("/company/offer-step-2");
 };
 </script>
 
 <template>
   <LayoutCompany>
     <SectionMain>
-      <SectionTitleLineWithButton
-        :icon="mdiBallotOutline"
-        title="Création offre 3"
-        main
-      >
-      </SectionTitleLineWithButton>
-
       <CardBox is-form @submit.prevent="submit">
-        <div>
+        <CardBoxComponentTitle
+          title="Création d'une offre - Étape 3"
+          centered
+        />
+        <ProgressBar :stepOne="true" :stepTwo="true" :step-three="true" />
+        <NotificationBarInCard
+          v-show="invalidUpdate"
+          color="danger"
+          :icon="mdiAlertCircle"
+          >OUPS! L'offre n'a pas été crée
+        </NotificationBarInCard>
+        <NotificationBarInCard
+          v-show="validUpdate"
+          color="success"
+          :icon="mdiAlertCircle"
+          >L'offre a été bien créée
+        </NotificationBarInCard>
+        <div v-for="i in counter" :key="i">
           <FormField
             label="Question pour le candidat"
             help=" Max 255 characters"
           >
-            <FormControl type="textarea" v-model="form.question" />
+            <FormControl
+              type="text"
+              maxLength="255"
+              v-model="form.questions[i - 1]"
+            />
           </FormField>
-          <FormField label="Réponse" help=" Max 255 characters">
-            <FormControl type="textarea" v-model="form.answer" />
-          </FormField>
-          <BaseButton color="info" label="+Ajouter une question" />
         </div>
+        <br />
+        <BaseButton
+          color="info"
+          label="+ Ajouter une question"
+          @click="addQuestion()"
+        />&ensp;
+        <BaseButton
+          color="danger"
+          label="- Supprimer une question"
+          v-if="counter > 1"
+          @click="removeQuestion"
+        />
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="info" label="Créer l'offre" />
+            <BaseButton
+              type="submit"
+              color="info"
+              label="Créer l'offre"
+              :isLoading="isLoading"
+              :disabled="isLoading"
+            />
             <BaseButton
               v-on:click="revenir"
               color="ligthDark"

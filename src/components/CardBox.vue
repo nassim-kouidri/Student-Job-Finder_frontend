@@ -6,7 +6,7 @@ import CardBoxComponentFooter from "@/components/CardBoxComponentFooter.vue";
 const props = defineProps({
   rounded: {
     type: String,
-    default: "rounded-2xl",
+    default: "rounded-lg",
   },
   flex: {
     type: String,
@@ -17,6 +17,7 @@ const props = defineProps({
   isForm: Boolean,
   isHoverable: Boolean,
   isModal: Boolean,
+  isFixed: Boolean,
 });
 
 const emit = defineEmits(["submit"]);
@@ -30,10 +31,13 @@ const componentClass = computed(() => {
     props.rounded,
     props.flex,
     props.isModal ? "dark:bg-slate-900" : "dark:bg-slate-900/70",
+    props.isFixed ? "fixed lg:w-[24rem] top-40" : "",
   ];
 
   if (props.isHoverable) {
-    base.push("hover:shadow-lg transition-shadow duration-500");
+    base.push(
+      "hover:border-purple-700 transition-border duration-100 cursor-pointer hover:dark:border-purple-700"
+    );
   }
 
   return base;
@@ -48,7 +52,7 @@ const submit = (event) => {
   <component
     :is="isForm ? 'form' : 'div'"
     :class="componentClass"
-    class="bg-white flex"
+    class="bg-white flex border-2 border-interit dark:border-slate-700"
     @submit="submit"
   >
     <slot v-if="hasComponentLayout" />
@@ -56,7 +60,7 @@ const submit = (event) => {
       <CardBoxComponentBody :no-padding="hasTable">
         <slot />
       </CardBoxComponentBody>
-      <CardBoxComponentFooter v-if="hasFooterSlot">
+      <CardBoxComponentFooter v-show="hasFooterSlot">
         <slot name="footer" />
       </CardBoxComponentFooter>
     </template>

@@ -8,6 +8,9 @@ import BaseIcon from "@/components/BaseIcon.vue";
 import UserAvatarCurrentUser from "@/components/UserAvatarCurrentUser.vue";
 import NavBarMenuList from "@/components/NavBarMenuList.vue";
 import BaseDivider from "@/components/BaseDivider.vue";
+import Cookies from "js-cookie";
+
+import { studentService } from "@/_services";
 
 const props = defineProps({
   item: {
@@ -37,7 +40,7 @@ const componentClass = computed(() => {
     isDropdownActive.value
       ? `${styleStore.navBarItemLabelActiveColorStyle} dark:text-purple-400`
       : `${styleStore.navBarItemLabelStyle} dark:text-white dark:hover:text-purple-400 ${styleStore.navBarItemLabelHoverStyle}`,
-    props.item.menu ? "lg:py-2 lg:px-3" : "py-2 px-3",
+    props.item.menu ? "lg:py-2 lg:px-3" : "py-2 px-1",
   ];
 
   if (props.item.isDesktopNoLabel) {
@@ -45,15 +48,30 @@ const componentClass = computed(() => {
   }
 
   if (props.item.isLoginButton) {
-    base.push("lg: border  border-purple-600 rounded", "lg: h-9");
+    base.push("border border-purple-500 rounded-full");
   }
-
   return base;
 });
 
-const itemLabel = computed(() =>
-  props.item.isCurrentUser ? useMainStore().userName : props.item.label
-);
+const user = ref();
+const logged = () => {
+  if (Cookies.get("userIsLogged") != null) return Cookies.get("userIsLogged");
+  else return false;
+};
+const imageStudent = ref(localStorage.getItem("image"));
+
+// const getLabel = () => {
+//   if (props.item.isCurrentUser) {
+//   } else return props.item.label;
+// };
+
+const getLabel = () => {
+  if (props.item.isCurrentUser && user != "") {
+    let userName = localStorage.getItem("userName");
+    let userFnamee = localStorage.getItem("userFname");
+    return userFnamee + " " + userName;
+  } else return props.item.label;
+};
 
 const isDropdownActive = ref(false);
 
@@ -106,19 +124,21 @@ onBeforeUnmount(() => {
     <div
       class="flex items-center"
       :class="{
-        'bg-gray-100 dark:bg-slate-800 lg:bg-transparent lg:dark:bg-transparent p-3 lg:p-0':
+        'bg-gray-100 dark:bg-slate-800 lg:bg-transparent lg:dark:bg-transparent lg:p-0':
           item.menu,
       }"
     >
       <UserAvatarCurrentUser
         v-if="item.isCurrentUser"
         class="w-6 h-6 mr-0 inline-flex"
+        :avatar="imageStudent"
+        username="user"
       />
       <BaseIcon v-if="item.icon" :path="item.icon" class="transition-colors" />
       <span
-        class="px-2 transition-colors"
+        class="px-2 transition-colors min-w-[10ch]"
         :class="{ 'lg:hidden': item.isDesktopNoLabel && item.icon }"
-        >{{ itemLabel }}</span
+        >{{ getLabel() }}</span
       >
       <BaseIcon
         v-if="item.menu"

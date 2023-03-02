@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { getButtonColor } from "@/colors.js";
 import BaseIcon from "@/components/BaseIcon.vue";
+import Loader from "@/components/Loader.vue";
 
 const props = defineProps({
   label: {
@@ -16,6 +17,10 @@ const props = defineProps({
   iconSize: {
     type: [String, Number],
     default: null,
+  },
+  iconColor: {
+    type: String,
+    default: "black",
   },
   href: {
     type: String,
@@ -41,11 +46,16 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
   small: Boolean,
   outline: Boolean,
   active: Boolean,
   disabled: Boolean,
   roundedFull: Boolean,
+  large: Boolean,
 });
 
 const is = computed(() => {
@@ -90,6 +100,7 @@ const componentClass = computed(() => {
     "m-0",
     props.disabled ? "cursor-not-allowed" : "cursor-pointer",
     props.roundedFull ? "rounded-full" : "rounded",
+    props.large ? "w-full" : "w-auto",
     getButtonColor(props.color, props.outline, !props.disabled, props.active),
   ];
 
@@ -119,7 +130,8 @@ const componentClass = computed(() => {
     :target="target"
     :disabled="disabled"
   >
-    <BaseIcon v-if="icon" :path="icon" :size="iconSize" />
-    <span v-if="label" :class="labelClass">{{ label }}</span>
+    <BaseIcon v-if="icon" :path="icon" :size="iconSize" :color="iconColor" />
+    <Loader v-if="isLoading" />
+    <span v-if="label && !isLoading" :class="labelClass">{{ label }}</span>
   </component>
 </template>

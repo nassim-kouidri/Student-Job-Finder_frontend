@@ -14,13 +14,9 @@ import NavBar from "@/components/NavBar.vue";
 import NavBarItemPlain from "@/components/NavBarItemPlain.vue";
 import AsideMenu from "@/components/AsideMenu.vue";
 import FooterBar from "@/components/FooterBar.vue";
+import Footer from "@/components/Footer.vue";
 import LogoSJF from "@/assets/Logo-PSD.png";
-
-useMainStore().setUser({
-  name: "Yacine Lallami",
-  email: "yacine@lallami.com",
-  avatar: "https://avatars.dicebear.com/api/initials/your-custom-seed.svg",
-});
+import { accountService } from "@/_services";
 
 const layoutAsidePadding = "xl:pl-0";
 
@@ -42,7 +38,17 @@ const menuClick = (event, item) => {
   }
 
   if (item.isLogout) {
+    localStorage.removeItem("image");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userFname");
+    document.cookie.split(";").forEach(function (c) {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+
     useMainStore().isLogged = false;
+    accountService.logout();
     router.push("/login");
   }
 };
@@ -57,16 +63,20 @@ const menuClick = (event, item) => {
   >
     <div
       :class="[layoutAsidePadding, { 'ml-60 lg:ml-0': isAsideMobileExpanded }]"
-      class="pt-14 min-h-screen w-screen transition-position lg:w-auto bg-gray-50 dark:bg-slate-800 dark:text-slate-100"
+      class="pt-14 h-full min-h-screen transition-position bg-gray-50 dark:bg-slate-800 dark:text-slate-100"
     >
       <NavBar
         :menu="menuNavBar"
         :menuUser="menuNavBarUser"
         :menuGuest="menuNavBarGuest"
         :menuSwitch="menuNavBarSwitchDark"
-        :class="[layoutAsidePadding, { 'ml-60 lg:ml-0': isAsideMobileExpanded },]"
-        @menu-click="menuClick">
-      </NavBar>      
+        :class="[
+          layoutAsidePadding,
+          { 'ml-60 lg:ml-0': isAsideMobileExpanded },
+        ]"
+        @menu-click="menuClick"
+      >
+      </NavBar>
       <slot />
     </div>
   </div>

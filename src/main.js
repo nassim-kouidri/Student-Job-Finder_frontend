@@ -6,8 +6,8 @@ import router from "./router";
 import { useMainStore } from "@/stores/main.js";
 import { useStyleStore } from "@/stores/style.js";
 import { darkModeKey, styleKey } from "@/config.js";
-
 import "./css/main.css";
+import Cookies from "js-cookie";
 
 /* Init Pinia */
 const pinia = createPinia();
@@ -20,11 +20,11 @@ const mainStore = useMainStore(pinia);
 const styleStore = useStyleStore(pinia);
 
 /* Fetch sample data */
-mainStore.fetch("clients");
-mainStore.fetch("history");
+//mainStore.fetch("clients");
+//mainStore.fetch("history");
 
 /* App style */
-styleStore.setStyle(localStorage[styleKey] ?? "basic");
+styleStore.setStyle("basic");
 
 /* Dark mode */
 if (

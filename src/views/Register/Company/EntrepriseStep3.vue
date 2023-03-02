@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useMainStore } from "@/stores/main.js";
 import Cookies from "js-cookie";
 import {
   mdiBallotOutline,
@@ -19,6 +20,8 @@ import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import FormCheckRadioGroup from "@/components/FormCheckRadioGroup.vue";
 import FormField from "@/components/FormField.vue";
 import FormControl from "@/components/FormControl.vue";
+import BaseDivider from "@/components/BaseDivider.vue";
+
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import SectionTitle from "@/components/SectionTitle.vue";
@@ -27,19 +30,16 @@ import { accountService } from "@/_services";
 let company_values = JSON.parse(Cookies.get("account_cookies"));
 
 const form = reactive({
-  // role: company_values.role,
+  role: "company",
   email: company_values.email,
   password: company_values.password,
   name: company_values.name,
   creationDate: company_values.creationDate,
-
   description: company_values.description,
-  adress: {
+  sector: company_values.sector,
+  address: {
     city: "",
     zipcode: null,
-  },
-  sector: {
-    name: company_values.sector,
   },
   website: "",
   socialMedia: "",
@@ -53,62 +53,62 @@ const account = reactive({
 
 const router = useRouter();
 
-function submit() {
+const isLoading = ref(false);
+
+const submit = () => {
+  isLoading.value = true;
   accountService
     .registerCompany(form)
     .then((res) => {
-      accountService
-        .login(account)
-        .then((resLogin) => {
-          accountService.saveToken("token", resLogin.data.token, 80000);
-          router.push("/company_dashboard");
-        })
-        .catch((errLogin) => console.log(errLogin));
+      isLoading.value = false;
+      router.push("/register/verify-step");
     })
-    .catch((err) => console.log(err));
-}
+    .catch((err) => ((isLoading.value = false), console.log(err)));
+};
+
+const revenir = () => {
+  router.push("/register/company-step-2");
+};
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionFullScreen v-slot="{ cardClass }" bg="gray">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <CardBoxComponentTitle title="Étape 3"></CardBoxComponentTitle>
+        <CardBoxComponentTitle
+          title="Étape 3"
+          underlined
+          centered
+        ></CardBoxComponentTitle>
         <div class="flex justify-center">
           <div class="flex flex-col justify-between w-10/12">
-            <FormField label="Emplacement">
+            <FormField label="Emplacement" required>
               <FormControl
-                v-model="form.adress.city"
+                v-model="form.address.city"
                 :icon="mdiMapMarker"
                 type="text"
                 placeholder="Ville"
                 required
               />
               <FormControl
-                v-model="form.adress.zipcode"
+                v-model="form.address.zipcode"
                 :icon="mdiMapMarker"
                 type="number"
                 placeholder="Code postal"
                 required
               />
             </FormField>
-            <FormField label="Site web ">
-              <FormControl
-                v-model="form.website"
-                :icon="mdiWeb"
-                type="text"
-                required
-              />
+            <FormField label="Site web">
+              <FormControl v-model="form.website" :icon="mdiWeb" type="text" />
             </FormField>
-            <FormField label="Réseau social ">
+            <FormField label="Réseau social">
               <FormControl
                 v-model="form.socialNetwork"
                 :icon="mdiLink"
                 type="text"
-                required
               />
             </FormField>
-            <FormField label="Télephone">
+            <FormField label="Télephone" required>
               <FormControl
                 v-model="form.phoneNumber"
                 :icon="mdiPhone"
@@ -116,12 +116,19 @@ function submit() {
                 required
               />
             </FormField>
-            <BaseButton type="submit" color="info" label="Enregistrer" />
-            <RouterLink to="/company-step-1"
-              ><div class="mt-4 underline text-center">
-                étape précédente
-              </div></RouterLink
-            >
+            <BaseButton
+              type="submit"
+              :disabled="isLoading"
+              :isLoading="isLoading"
+              color="info"
+              label="Suivant"
+            />
+            <BaseDivider />
+            <BaseButton
+              v-on:click="revenir"
+              color="infligthDarko"
+              label="Revenir"
+            />
           </div>
         </div>
       </CardBox>

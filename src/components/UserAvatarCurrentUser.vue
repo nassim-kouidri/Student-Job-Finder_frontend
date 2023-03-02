@@ -3,10 +3,17 @@ import { useMainStore } from "@/stores/main";
 import UserAvatar from "@/components/UserAvatar.vue";
 
 const mainStore = useMainStore();
+
+const props = defineProps({
+  avatar: {
+    type: String,
+    default: "",
+  },
+});
 </script>
 
 <template>
-  <UserAvatar :username="mainStore.userName" :avatar="mainStore.userAvatar">
+  <UserAvatar :avatar="avatar">
     <slot />
   </UserAvatar>
 </template>
